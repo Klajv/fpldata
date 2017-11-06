@@ -68,13 +68,17 @@ func player(p map[string]interface{}, gw int) Player {
   var roundsplayed []int
   for _, gp := range pdetails["history"].([]interface{}) {
     gp := gp.(map[string]interface{})
-    if len(roundsplayed) == 0 {
-      roundsplayed = append(roundsplayed, int(gp["round"].(float64)))
+    if int(gp["minutes"].(float64)) != 0 {
+      if len(roundsplayed) == 0 {
+        roundsplayed = append(roundsplayed, int(gp["round"].(float64)))
+      }
+      if roundsplayed[len(roundsplayed)-1] != int(gp["round"].(float64)) {
+        roundsplayed = append(roundsplayed, int(gp["round"].(float64)))
+      }
+      if (int(gp["round"].(float64)) <= len(gamepoints)) {
+        gamepoints[int(gp["round"].(float64))-1] += int(gp["total_points"].(float64))
+      }
     }
-    if roundsplayed[len(roundsplayed)-1] != int(gp["round"].(float64)) {
-      roundsplayed = append(roundsplayed, int(gp["round"].(float64)))
-    }
-    gamepoints[int(gp["round"].(float64))-1] += int(gp["total_points"].(float64))
   }
 
   fivegamepoints := 0
@@ -131,7 +135,7 @@ func gameweek() int {
     if gw["finished"] == true {
       gameweek += 1
     } else {
-      return gameweek // gameweek + 1 if you want latest mid-gameweek stats included
+      return gameweek +1 // gameweek + 1 if you want latest mid-gameweek stats included
     }
   }
 
